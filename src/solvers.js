@@ -109,38 +109,54 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
+  var createNewRow = function(n){
+  //creates new row of n length with a 1 in the last index
+    var row = _(_.range(n)).map(function() {
+      return 0;
+    });
+    return row;
+  };
   var solution = undefined; //fixme
   //place a rook in first available space in first row
-  var board = new Board({n: n});
+  var colTrack = 0;
   var pieces = 0;
-  
-  var solFinder = function(n, c){
-    if (c === n){
+  var rowBuilder = function(n, boardSoFar){
+    var rowIndex = boardSoFar ? boardSoFar.length : 0;
+    if (n === 0){
       return [];
     }
-    var r = 0;
-    var c = c;
-    while (pieces < n && r < n){
-      board.togglePiece(r, c);
+    if (rowIndex > n){
+      return [];
+    }
+    boardSoFar = boardSoFar || createNewRow(n)
+    for (var i = rowIndex; i < n; i++){
+      boardSoFar[i] = createNewRow(n);
+    }
+    var board = new Board(boardSoFar);
+    for (var i = 0; i < n; i++){
+      board.togglePiece(rowIndex, i);
       pieces++;
-      if (board.hasAnyQueensConflicts()){
-        board.togglePiece(r, c);
+      if(!board.hasAnyQueensConflicts()){
+        if (pieces === n){
+          return board.rows();
+        } else {
+          var tempBoard = [];
+          for(var j = 0; j <= rowIndex; j++){
+            tempBoard.push(board.get(j));
+          }
+          rowBuilder(n, tempBoard);
+          board.togglePiece(rowIndex, i);
+          pieces--;
+        }
+      } else {
+        board.togglePiece(rowIndex, i);
         pieces--;
       }
-      c++;
-      if (c >= n){
-        c = 0;
-        r++;
-      }
-    }
-    if (pieces === n){
-      return board.rows();
-    } else {
-      return solFinder(n, c + 1);
     }
   };
-  
-  solution = solFinder(n, 0);
+  debugger;
+  solution = rowBuilder(n);
+  debugger;
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
