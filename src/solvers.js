@@ -48,80 +48,62 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutionCount = 0; //fixme
-  var sols = [[]];
+  var sols = [];
   var thisSol;
   var idx;
   var tempBoard;
   var numSols;
   var tempRow = [];
   var board;
+
+
   var solCounter = function(x, solutionsSoFar){
-    var tempSols = solutionsSoFar;
+    var tempSols = solutionsSoFar.slice();
+    var newSols = solutionsSoFar.slice();
+
     if (x > n) {
-    return solutionsSoFar; 
+      return tempSols; 
     } else {
-      numSols = solutionsSoFar.length;
-      for (var i=0; i<numSols; i++){
-        tempBoard = solutionsSoFar[i];
-        for (var j=0; j<tempBoard.length; j++){
+      numSols = tempSols.length;
+      debugger;
+      for (var i = 0; i < numSols; i++){
+        tempBoard = tempSols[i];
+        
+        for (var j = 0; j < tempBoard.length; j++){
           tempBoard[j].push(0);
           tempRow.push(0);
         }
         tempRow.push(0);
         tempBoard.push(tempRow);
       }
+      if (!tempBoard){
+        tempBoard = [[0]];
+      }
       board = new Board(tempBoard);
-      for (i=0; i<x; i++){
-        board.togglePiece(i, x-1);
-        if (!board.hasAnyRooksConflicts){
-          tempSols.push(board.rows());
+      for (i= 0; i < x; i++){
+        board.togglePiece(i, x - 1);
+        if (!board.hasAnyRooksConflicts()){      
+          newSols.push(board.rows().slice());
+          board.togglePiece(i, x - 1)
         }
       }
-      for (i=0; i<x-1; i++){
-        board.togglePiece(x-1, i);
-        if(!board.hasAnyRooksConflicts){
-          tempSols.push(board.rows());
+      for (i = 0; i < x - 1; i++){
+        board.togglePiece(x - 1, i);
+        if(!board.hasAnyRooksConflicts()){
+          newSols.push(board.rows().slice());
+          board.togglePiece(x - 1, i);
         }
       }
-      solCounter(x + 1, tempSols)
+      return solCounter(x + 1, newSols);
     }
-    
-
-
-
-
-    // Factorial Algorithm
-    // if (n === 1){
-    //   return 1;
-    // } else {
-    //   return n * solCounter(n-1);
-    // }
-    //loop over whole first row
-      //call findNrooksSolution
-
-
-    //if n=1, return 1
-
-    //if n=2, return 2 * result of solCounter(1)
-    //if n=3, return 3 * result of solCounter(2)
   };
-
-  // for(var i =0; i < n; i++){
-  //   thisSol = this.findNRooksSolution(n, i);
-  //   if (!_.contains(sols, thisSol)){
-  //     sols.push(thisSol);
-  //     solutionCount++;
-  //   }
-  // }
+  
   //solutions[i] is array of rows that comprise a solution (length = num of solutions)
   //solutions[i][i] is a row within a giving solution
   //solutions[i][i][i] is the status of a piece within a given row of a given solution
 
   sols = solCounter(1, sols)
-
-
-
-  solutionCount = sols[i].length
+  solutionCount = sols.length
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
