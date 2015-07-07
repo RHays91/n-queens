@@ -48,16 +48,54 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutionCount = 0; //fixme
-  var sols = [];
+  var sols = [[]];
   var thisSol;
   var idx;
-  var solCounter = function(n){
-
-    if (n === 1){
-      return 1;
+  var tempBoard;
+  var numSols;
+  var tempRow = [];
+  var board;
+  var solCounter = function(x, solutionsSoFar){
+    var tempSols = solutionsSoFar;
+    if (x > n) {
+    return solutionsSoFar; 
     } else {
-      return n * solCounter(n-1);
+      numSols = solutionsSoFar.length;
+      for (var i=0; i<numSols; i++){
+        tempBoard = solutionsSoFar[i];
+        for (var j=0; j<tempBoard.length; j++){
+          tempBoard[j].push(0);
+          tempRow.push(0);
+        }
+        tempRow.push(0);
+        tempBoard.push(tempRow);
+      }
+      board = new Board(tempBoard);
+      for (i=0; i<x; i++){
+        board.togglePiece(i, x-1);
+        if (!board.hasAnyRooksConflicts){
+          tempSols.push(board.rows());
+        }
+      }
+      for (i=0; i<x-1; i++){
+        board.togglePiece(x-1, i);
+        if(!board.hasAnyRooksConflicts){
+          tempSols.push(board.rows());
+        }
+      }
+      solCounter(x + 1, tempSols)
     }
+    
+
+
+
+
+    // Factorial Algorithm
+    // if (n === 1){
+    //   return 1;
+    // } else {
+    //   return n * solCounter(n-1);
+    // }
     //loop over whole first row
       //call findNrooksSolution
 
@@ -75,11 +113,15 @@ window.countNRooksSolutions = function(n) {
   //     solutionCount++;
   //   }
   // }
-  solutionCount = solCounter(n);
+  //solutions[i] is array of rows that comprise a solution (length = num of solutions)
+  //solutions[i][i] is a row within a giving solution
+  //solutions[i][i][i] is the status of a piece within a given row of a given solution
+
+  sols = solCounter(1, sols)
 
 
 
-  
+  solutionCount = sols[i].length
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
