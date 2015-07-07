@@ -51,58 +51,59 @@ window.countNRooksSolutions = function(n) {
   var sols = [];
   var thisSol;
   var idx;
-  var tempBoard;
+  var boardMatrix;
   var numSols;
-  var tempRow = [];
+  var newRow;
   var board;
 
 
-  var solCounter = function(x, solutionsSoFar){
-    var tempSols = solutionsSoFar.slice();
-    var newSols = solutionsSoFar.slice();
+    var createNewRow = function(n){
+    //creates new row of n length with a 1 in the last index
+      var row = _(_.range(n)).map(function() {
+        return 0;
+      });
+      row[n-1] = 1;
+      return row;
+    };
 
-    if (x > n) {
-      return tempSols; 
+  var solCounter = function(currentN, board){
+    if (currentN <= n){
+      var boardMatrix = board.rows();
+      for (var i = 0; i < currentN; i++){
+        newRow = createNewRow(currentN);
+
+        for (var j = 0; j < boardMatrix.length; j++){
+          boardMatrix[j].push(0);
+        }
+
+        debugger;
+        boardMatrix.splice(i, 0, newRow)
+        var tempBoard = new Board(boardMatrix);
+        if (!tempBoard.hasAnyRooksConflicts() && currentN === n && !_.contains(sols, boardMatrix.toString())){
+          sols.push(boardMatrix.toString());
+        } else if (!tempBoard.hasAnyRooksConflicts() && currentN < n) {
+          solCounter(currentN + 1, tempBoard)
+        }
+        debugger;
+        boardMatrix.splice(i, 1);
+        var length = boardMatrix.length
+        for(j = 0; j < length; j++){
+          if(boardMatrix[j]){
+            boardMatrix[j].pop();
+          }
+        }
+      }
+
+
     } else {
-      numSols = tempSols.length;
-      debugger;
-      for (var i = 0; i < numSols; i++){
-        tempBoard = tempSols[i];
-        
-        for (var j = 0; j < tempBoard.length; j++){
-          tempBoard[j].push(0);
-          tempRow.push(0);
-        }
-        tempRow.push(0);
-        tempBoard.push(tempRow);
-      }
-      if (!tempBoard){
-        tempBoard = [[0]];
-      }
-      board = new Board(tempBoard);
-      for (i= 0; i < x; i++){
-        board.togglePiece(i, x - 1);
-        if (!board.hasAnyRooksConflicts()){      
-          newSols.push(board.rows().slice());
-          board.togglePiece(i, x - 1)
-        }
-      }
-      for (i = 0; i < x - 1; i++){
-        board.togglePiece(x - 1, i);
-        if(!board.hasAnyRooksConflicts()){
-          newSols.push(board.rows().slice());
-          board.togglePiece(x - 1, i);
-        }
-      }
-      return solCounter(x + 1, newSols);
+      return;
     }
   };
   
   //solutions[i] is array of rows that comprise a solution (length = num of solutions)
   //solutions[i][i] is a row within a giving solution
   //solutions[i][i][i] is the status of a piece within a given row of a given solution
-
-  sols = solCounter(1, sols)
+  solCounter(1, new Board({n: 0}))
   solutionCount = sols.length
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
