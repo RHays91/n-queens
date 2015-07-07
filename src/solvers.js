@@ -49,24 +49,20 @@ window.findNRooksSolution = function(n) {
 window.countNRooksSolutions = function(n) {
   var solutionCount = 0; //fixme
   var sols = [];
-  var thisSol;
-  var idx;
-  var boardMatrix;
-  var numSols;
   var newRow;
-  var board;
 
 
-    var createNewRow = function(n){
-    //creates new row of n length with a 1 in the last index
-      var row = _(_.range(n)).map(function() {
-        return 0;
-      });
-      row[n-1] = 1;
-      return row;
-    };
+  var createNewRow = function(n){
+  //creates new row of n length with a 1 in the last index
+    var row = _(_.range(n)).map(function() {
+      return 0;
+    });
+    row[n-1] = 1;
+    return row;
+  };
 
   var solCounter = function(currentN, board){
+
     if (currentN <= n){
       var boardMatrix = board.rows();
       for (var i = 0; i < currentN; i++){
